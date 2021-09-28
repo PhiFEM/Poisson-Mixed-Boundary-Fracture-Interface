@@ -65,7 +65,7 @@ error_l2=[]
 error_h1=[]
 hh = []
 
-start,end,step= 1,4,1
+start,end,step= 1,6,1
 for i in range(start,end,step):
     print('###########################')
     print('### iteration ',i,'###')
@@ -293,8 +293,8 @@ for i in range(start,end,step):
         + Gh1 \
         + gamma_p*h**(-2)*df.inner(u1,v1)*dx(interf) \
         + gamma_u*df.inner(sigma(u1), sigma(v1))*dx(interf) \
-        + gamma_u_N*df.inner(sigma(u1), sigma(v1))*dx(fracture) - (w("+")*df.inner(df.dot(sigma(u1)("+"),n("+")),v1("+"))+w("-")*df.inner(df.dot(sigma(u1)("-"),n("-")),v1("-")))*dS(gamma_fracture_interf1) \
-        + sigma_jump*h**2*df.inner(df.div(sigma(u1)),df.div(sigma(v1)))*dx(fracture_interf)
+        + gamma_u_N*df.inner(sigma(u1), sigma(v1))*dx(fracture) - (w("+")*df.inner(df.dot(sigma(u1)("+"),n("+")),v1("+"))+w("-")*df.inner(df.dot(sigma(u1)("-"),n("-")),v1("-")))*dS(gamma_fracture_interf1) #\
+        #+ sigma_jump*h**2*df.inner(df.div(sigma(u1)),df.div(sigma(v1)))*dx(fracture_interf)
 
     au1z1 = gamma_u*df.inner(sigma(u1), z1)*dx(interf)
     au1v2 = -gamma_p*h**(-2)*df.inner(u1,v2)*dx(interf)
@@ -307,8 +307,8 @@ for i in range(start,end,step):
         + Gh2 \
         + gamma_p*h**(-2)*df.inner(u2,v2)*dx(interf) \
         + gamma_u*df.inner(sigma(u2), sigma(v2))*dx(interf) \
-        + gamma_u_N*df.inner(sigma(u2), sigma(v2))*dx(fracture)- (w("+")*df.inner(df.dot(sigma(u2)("+"),n("+")),v2("+"))+w("-")*df.inner(df.dot(sigma(u2)("-"),n("-")),v2("-")))*dS(gamma_fracture_interf2) \
-        + sigma_jump*h**2*df.inner(df.div(sigma(u2)),df.div(sigma(v2)))*dx(fracture_interf)
+        + gamma_u_N*df.inner(sigma(u2), sigma(v2))*dx(fracture)- (w("+")*df.inner(df.dot(sigma(u2)("+"),n("+")),v2("+"))+w("-")*df.inner(df.dot(sigma(u2)("-"),n("-")),v2("-")))*dS(gamma_fracture_interf2) #\
+        #+ sigma_jump*h**2*df.inner(df.div(sigma(u2)),df.div(sigma(v2)))*dx(fracture_interf)
     au2z2 = gamma_u*df.inner(sigma(u2), z2)*dx(interf)
     au2q = -gamma_p*h**(-3)*df.inner(u2,q*phi)*dx(interf)
     au2z2_N = gamma_u_N*df.inner(sigma(u2),z2_N)*dx(fracture) 
@@ -355,10 +355,10 @@ for i in range(start,end,step):
     ap2_Nq2_N = gamma_p_N*h**(-4)*df.inner(p2_N*phi, q2_N*phi)*dx(fracture)         
     
             
-    lv1 = df.dot(f,v1)*(dx(omega1) + dx(interf) + dx(fracture) + dx(fracture_interf)) \
-         - sigma_jump*h**2*df.inner(f,df.div(sigma(v1)))*dx(fracture_interf)
-    lv2 = df.dot(f,v2)*(dx(omega2) + dx(interf) + dx(fracture) + dx(fracture_interf))  \
-         - sigma_jump*h**2*df.inner(f,df.div(sigma(v2)))*dx(fracture_interf)
+    lv1 = df.dot(f,v1)*(dx(omega1) + dx(interf) + dx(fracture) + dx(fracture_interf)) #\
+         #- sigma_jump*h**2*df.inner(f,df.div(sigma(v1)))*dx(fracture_interf)
+    lv2 = df.dot(f,v2)*(dx(omega2) + dx(interf) + dx(fracture) + dx(fracture_interf)) # \
+         #- sigma_jump*h**2*df.inner(f,df.div(sigma(v2)))*dx(fracture_interf)
     lz1 = gamma_div * df.inner(f,df.div(z1))*(dx(interf)) 
     lz2 = gamma_div * df.inner(f,df.div(z2))*(dx(interf)) 
     lz1_N = gamma_div_N * df.inner(f,df.div(z1_N))*(dx(fracture)) \
