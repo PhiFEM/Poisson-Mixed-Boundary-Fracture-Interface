@@ -337,7 +337,10 @@ for i in range(start, end, step):
 
 
 #  Write the output file for latex
-f = open('outputs/output_Phi_Fem_Mixed_Elasticity_P{name0}.txt'.format(name0=degV),'w')
+if matching == True:
+    f = open('outputs/output_Phi_Fem_Mixed_Elasticity_P{name0}_matching.txt'.format(name0=degV),'w')
+else:
+    f = open('outputs/output_Phi_Fem_Mixed_Elasticity_P{name0}_not_matching.txt'.format(name0=degV),'w')
 f.write('relative L2 norm phi fem: \n')	
 output_latex(f, hh_phi, error_l2_phi)
 f.write('relative H1 norm phi fem : \n')	
