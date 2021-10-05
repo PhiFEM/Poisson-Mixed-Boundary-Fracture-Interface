@@ -2,7 +2,6 @@ import dolfin as df
 import matplotlib.pyplot as plt 
 from matplotlib import rc, rcParams
 import multiphenics as mph 
-import numpy as np
 
 
 # plot parameters
@@ -32,6 +31,8 @@ df.parameters["form_compiler"]["representation"] = 'uflacs'
 degV = 2
 degPhi = 2 + degV 
 
+# matching of the mesh with the change of boundary condition
+matching = True
 
 # elastic parameters
 E = 7
@@ -76,7 +77,10 @@ for i in range(start,end,step):
     print('###########################')
     print('### iteration ',i,'###')
     print('###########################')
-    H = 10*2**i
+    if matching == True:
+        H = 10*2**i
+    else:
+        H = 10*2**i+1
     # creation of the domain (check which cells are on the fracture)
     mesh = df.RectangleMesh(df.Point(.0,.0), df.Point(1,1),H,H)
     hh.append(mesh.hmax())
@@ -426,7 +430,7 @@ for i in range(start,end,step):
     
 
 #  Write the output file for latex
-if np.mod(int(H),2):
+if matching == True:
     f = open('outputs/output_fracture_P{name0}_matching.txt'.format(name0=degV),'w')
 else:
     f = open('outputs/output_fracture_P{name0}_not_matching.txt'.format(name0=degV),'w')
