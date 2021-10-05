@@ -29,6 +29,17 @@ df.parameters["form_compiler"]["representation"] = 'uflacs'
 degV = 2
 degPhi = 2 + degV
 
+# matching of the mesh with the change of boundary condition
+matching = True
+
+# elastic parameters
+E = 2.0
+nu = 0.3
+lambda_ = E*nu/((1.0+nu)*(1.0-2.0*nu))
+mu = E/(2.0*(1.0+nu))
+print('lambda',lambda_)
+print('mu',mu)
+
 # functions and parameters for elasticity
 def sigma(u):
     return lambda_ * df.div(u)*df.Identity(2) + 2.0*mu*epsilon(u)
@@ -36,17 +47,6 @@ def sigma(u):
 def epsilon(u):
     return (1.0/2.0)*(df.grad(u) + df.grad(u).T)
 
-lambda_ = 1.25
-mu = 1.0
-rho = 1.0
-
-E = 2.0
-nu = 0.3
-
-lambda_ = E*nu/((1.0+nu)*(1.0-2.0*nu))
-mu = E/(2.0*(1.0+nu))
-print(lambda_)
-print(mu)
 
 # Function used to write in the outputs files
 def output_latex(f,A,B):
@@ -270,7 +270,8 @@ for i in range(start,end,step):
 
 # Computation of the standard FEM       
 domain = mshr.Circle(df.Point(0.5,0.5),df.sqrt(2.0)/4.0) # creation of the domain
-domain.set_subdomain(1, mshr.Rectangle(df.Point(0.0, 0.0), df.Point(0.5, 1.0))) 
+if matching == True:
+    domain.set_subdomain(1, mshr.Rectangle(df.Point(0.0, 0.0), df.Point(0.5, 1.0))) 
 for i in range(start, end, step):
     H = 8*2**(i-1) # to have approximately the same precision as in the phi-fem computation
     mesh = mshr.generate_mesh(domain,H)
@@ -335,67 +336,8 @@ for i in range(start, end, step):
     print("Relative error H1 standard FEM : ",relative_error_H1_standard_fem)
 
 
-
-# Plot results : error/precision, Time/precision, Time/error and Total_time/error
-'''
-plt.figure()
-plt.loglog(hh_phi,error_h1_phi,'o--', label=r'$\phi$-FEM $H^1$')
-plt.loglog(hh_phi,error_l2_phi,'o-', label=r'$\phi$-FEM $L^2$')
-plt.loglog(hh_standard,error_h1_standard, '--x',label=r'Std FEM $H^1$')
-plt.loglog(hh_standard,error_l2_standard, '-x',label=r'Std FEM $L^2$')
-if degV == 1 :
-    plt.loglog(hh_phi, hh_phi, '.', label="Linear")
-    plt.loglog(hh_phi,[hhh**2 for hhh in hh_phi], '.',label="Quadratic")
-elif degV == 2 :
-    plt.loglog(hh_phi,[hhh**2 for hhh in hh_phi], '.',label="Quadratic")
-    plt.loglog(hh_phi,[hhh**3 for hhh in hh_phi], '.',label="Cubic")
-
-plt.xlabel("$h$")
-plt.ylabel(r'$\frac{\|u-u_h\|}{\|u\|}$')
-plt.legend(loc='upper right', ncol=2)
-plt.title(r'Relative error : $ \frac{\|u-u_h\|}{\|u\|} $ for $L^2$ and $H^1$ norms', y=1.025)
-plt.tight_layout()
-plt.savefig('relative_error_Phi_Fem_Mixed_Elasticity_P_{name0}.png'.format(name0=degV))
-plt.show()
-
-plt.figure()
-plt.loglog(hh_phi,Time_assemble_phi, '-o',label=r'Assemble $\phi$-FEM')
-plt.loglog(hh_phi,Time_solve_phi,'--o', label=r'Solve $\phi$-FEM')
-plt.loglog(hh_standard,Time_assemble_standard, '-x',label=r'Assemble standard FEM')
-plt.loglog(hh_standard,Time_solve_standard,'--x', label=r'Solve standard FEM')
-plt.xlabel("$h$")
-plt.ylabel("Time (s)")
-plt.legend(loc='upper right')
-plt.title("Computing time")
-plt.tight_layout()
-plt.savefig('Time_precision_Phi_Fem_Mixed_Elasticity_P_{name0}.png'.format(name0=degV))
-plt.show()
-plt.figure()
-plt.loglog(error_l2_phi,Time_assemble_phi, '-o',label=r'Assemble $\phi$-fem')
-plt.loglog(error_l2_phi,Time_solve_phi,'--o', label=r'Solve $\phi$-fem')
-plt.loglog(error_l2_standard,Time_assemble_standard,'-x', label="Assemble standard FEM")
-plt.loglog(error_l2_standard,Time_solve_standard,'--x', label="Solve standard FEM")
-plt.xlabel(r'$\frac{\|u-u_h\|_{L^2}}{\|u\|_{L^2}}$')
-plt.ylabel("Time (s)")
-plt.title(r'Computing time')
-plt.legend(loc='upper right')
-plt.tight_layout()
-plt.savefig('Time_error_P_Phi_Fem_Mixed_Elasticity_{name0}.png'.format(name0=degV))
-plt.show()
-plt.figure()
-plt.loglog(error_l2_phi,Time_total_phi,'-o', label=r'$\phi$-fem')
-plt.loglog(error_l2_standard,Time_total_standard,'-x', label="Standard FEM")
-plt.xlabel(r'$\frac{\|u-u_h\|_{L^2}}{\|u\|_{L^2}}$')
-plt.ylabel("Time (s)")
-plt.title(r'Computing time')
-plt.legend(loc='upper right')
-plt.tight_layout()
-plt.savefig('Total_time_error_Phi_Fem_Mixed_Elasticity_P_{name0}.png'.format(name0=degV))
-plt.show()
-'''
-
 #  Write the output file for latex
-f = open('output_Phi_Fem_Mixed_Elasticity_P{name0}.txt'.format(name0=degV),'w')
+f = open('outputs/output_Phi_Fem_Mixed_Elasticity_P{name0}.txt'.format(name0=degV),'w')
 f.write('relative L2 norm phi fem: \n')	
 output_latex(f, hh_phi, error_l2_phi)
 f.write('relative H1 norm phi fem : \n')	
