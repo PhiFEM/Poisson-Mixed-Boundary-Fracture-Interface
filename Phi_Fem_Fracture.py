@@ -70,7 +70,7 @@ for i in range(start,end,step):
     print('###########################')
     print('### iteration ',i,'###')
     print('###########################')
-    H = 10*2**i+1
+    H = 10*2**i
     # creation of the domain (check which cells are on the fracture)
     mesh = df.RectangleMesh(df.Point(.0,.0), df.Point(1,1),H,H)
     hh.append(mesh.hmax())
@@ -227,7 +227,9 @@ for i in range(start,end,step):
     
     for cell in df.cells(mesh):
         if Cell[cell] == fracture_interf :
-            print('toto')
+            for facet in df.facets(cell):
+                if Facet[facet] == fracture or Facet[facet] == interf:
+                    Facet[facet] = fracture_interf   
         if Cell[cell] == omega1:
             for facet in df.facets(cell):
                 if Facet[facet] == fracture_interf :
@@ -270,7 +272,7 @@ for i in range(start,end,step):
     
     gamma_div, gamma_u, gamma_p, gamma_y = 1.0, 1.0, 1.0, 1.0
     gamma_div_N, gamma_u_N, gamma_p_N = 1.0, 1.0, 1.0
-    sigma_jump = 1.0
+    sigma_jump = 20.0
 
     # DG for the interface
     DG0 = df.FunctionSpace(mesh,'DG',0)
@@ -285,8 +287,8 @@ for i in range(start,end,step):
 
 
     # Construction of the bilinear and linear forms
-    Gh1 = sigma_jump*df.avg(h)*df.inner(df.jump(sigma(u1),n), df.jump(sigma(v1),n))*(dS(gamma2)+dS(gamma2_N)+dS(gamma_fracture_interf2))     
-    Gh2 = sigma_jump*df.avg(h)*df.inner(df.jump(sigma(u2),n), df.jump(sigma(v2),n))*(dS(gamma1)+dS(gamma1_N)+dS(gamma_fracture_interf1))
+    Gh1 = sigma_jump*df.avg(h)*df.inner(df.jump(sigma(u1),n), df.jump(sigma(v1),n))*(dS(gamma2)+dS(gamma2_N)+dS(gamma_fracture_interf2)+dS(fracture_interf)+dS(interf)+dS(fracture))     
+    Gh2 = sigma_jump*df.avg(h)*df.inner(df.jump(sigma(u2),n), df.jump(sigma(v2),n))*(dS(gamma1)+dS(gamma1_N)+dS(gamma_fracture_interf1)+dS(fracture_interf)+dS(interf)+dS(fracture))
 
     
     au1v1 = df.inner(sigma(u1), epsilon(v1))*(dx(omega1) + dx(interf) + dx(fracture) + dx(fracture_interf))  \
@@ -410,14 +412,17 @@ for i in range(start,end,step):
     #u_h = df.project(u_h, V)
     u_ex = df.project(u_ex, V)
     
-    error_l2.append(df.assemble((u_ex-UU[0])**2*dx(omega1)+(u_ex-UU[1])**2*(dx(omega2)+dx(fracture)+dx(interf)))**(0.5)/df.assemble(u_ex**2*df.dx)**(0.5))            
-    error_h1.append((df.assemble((df.grad(u_ex-UU[0])**2)*dx(omega1)+df.grad(u_ex-UU[1])**2*(dx(omega2)+df.dx(fracture)+dx(interf)))**(0.5))/(df.assemble(df.grad(u_ex)**2*df.dx)**(0.5)))          
+    error_l2.append(df.assemble((u_ex-UU[0])**2*dx(omega1)+(u_ex-UU[1])**2*dx(omega2))**(0.5)/df.assemble(u_ex**2*df.dx)**(0.5))            
+    error_h1.append((df.assemble((df.grad(u_ex-UU[0])**2)*dx(omega1)+df.grad(u_ex-UU[1])**2*dx(omega2))**(0.5))/(df.assemble(df.grad(u_ex)**2*df.dx)**(0.5)))          
     print('h = ',mesh.hmax())
     print('erreur L2 = ',error_l2[-1])
     print('erreur H1 = ',error_h1[-1])
     
 #  Write the output file for latex
-f = open('outputs/output_fracture_P{name0}.txt'.format(name0=degV),'w')
+if np.mod(H,0):
+    f = open('outputs/output_fracture_P{name0}_matching.txt'.format(name0=degV),'w')
+else:
+    f = open('outputs/output_fracture_P{name0}_not_matching.txt'.format(name0=degV),'w')
 f.write('relative L2 norm phi fem: \n')	
 output_latex(f, hh, error_l2)
 f.write('relative H1 norm phi fem : \n')	
