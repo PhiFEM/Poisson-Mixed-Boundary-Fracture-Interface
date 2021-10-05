@@ -381,19 +381,6 @@ for i in range(start, end, step):
     print("time standard FEM : ",end_solve-start_assemble)
 
 
-
-
-
-"""# plot error on the figure matplotlib   
-plt.loglog(hh_phi_fem,error_h1_phi_fem,'o--', label=r'$\phi$-FEM $H^1$')
-plt.loglog(hh_phi_fem,error_l2_phi_fem,'o-', label=r'$\phi$-FEM $L^2$')
-plt.xlabel("$h$")
-plt.ylabel(r'$\frac{\|u-u_h\|}{\|u\|}$')
-plt.legend(loc='lower right', ncol=2)
-plt.title(r'Relative error : $ \frac{\|u-u_h\|}{\|u\|} $ for $L^2$ and $H^1$ norms', y=1.025)
-plt.tight_layout()
-plt.show()"""
-
 # Function used to write in the outputs files
 def output_latex(f,A,B):
 	for i in range(len(A)):
@@ -404,8 +391,9 @@ def output_latex(f,A,B):
 		f.write(')\n')
 	f.write('\n')
 
+
 #  Write the output file for latex
-f = open('elasticity_interface_P{name0}.txt'.format(name0=degV),'w')
+f = open('outputs/outputs_elasticity_interface_P{name0}.txt'.format(name0=degV),'w')
 f.write('(E_1, nu_1, lambda_1, mu_1) = ( ' + str(E1) + ', ' + str(nu1) + ', ' + str(lambda_1) + ', ' + str(mu1) + ') \n')  	
 f.write('(E_2, nu_2, lambda_2, mu_2) = ( ' + str(E2) + ', ' + str(nu2) + ', ' + str(lambda_2) + ', ' + str(mu2) + ') \n')
 f.write('relative L2 norm phi fem: \n')	
