@@ -4,6 +4,7 @@ from matplotlib import rc, rcParams
 import multiphenics as mph 
 import numpy as np
 
+
 # plot parameters
 plt.style.use('bmh') 
 params = {'axes.labelsize': 'large',
@@ -18,12 +19,42 @@ params = {'axes.labelsize': 'large',
           'patch.edgecolor': 'black'}
 plt.rcParams.update(params)
 
+
 # dolfin parameters
 df.parameters["ghost_mode"] = "shared_facet" 
 df.parameters["form_compiler"]["cpp_optimize"] = True
 df.parameters["form_compiler"]["optimize"] = True
 df.parameters['allow_extrapolation'] = True
 df.parameters["form_compiler"]["representation"] = 'uflacs'
+
+ 
+# degree of interpolation for V and Vphi
+degV = 2
+degPhi = 2 + degV 
+
+
+# elastic parameters
+E = 7
+nu = 0.3
+Lambda = E*nu/((1.0+nu)*(1.0-2.0*nu))
+mu = E/(2.0*(1.0+nu))
+
+
+def sigma(u):
+    return Lambda * df.div(u)*df.Identity(2) + 2.0*mu*epsilon(u)
+
+
+def epsilon(u):
+    return (1.0/2.0)*(df.grad(u) + df.grad(u).T)
+
+
+# expression of phi
+class phi_expr(df.UserExpression) : 
+    def eval(self, value, x):
+        value[0] = x[1] - 0.25*df.sin(2*df.pi*x[0]) - .5
+    def value_shape(self):
+        return (2,)
+
 
 # Function used to write in the outputs files
 def output_latex(f,A,B):
@@ -34,32 +65,6 @@ def output_latex(f,A,B):
 		f.write(str(B[i]))
 		f.write(')\n')
 	f.write('\n')
- 
-# degree of interpolation for V and Vphi
-degV = 2
-degPhi = 2 + degV 
-
-
-def sigma(u):
-    return Lambda * df.div(u)*df.Identity(2) + 2.0*mu*epsilon(u)
-
-def epsilon(u):
-    return (1.0/2.0)*(df.grad(u) + df.grad(u).T)
-
-
-E = 7
-nu = 0.3
-
-Lambda = E*nu/((1.0+nu)*(1.0-2.0*nu))
-mu = E/(2.0*(1.0+nu))
-
-
-# expression of phi
-class phi_expr(df.UserExpression) : 
-    def eval(self, value, x):
-        value[0] = x[1] - 0.25*df.sin(2*df.pi*x[0]) - .5
-    def value_shape(self):
-        return (2,)
 
 
 error_l2=[]
@@ -419,6 +424,7 @@ for i in range(start,end,step):
     print('erreur L2 = ',error_l2[-1])
     print('erreur H1 = ',error_h1[-1])
     
+
 #  Write the output file for latex
 if np.mod(int(H),2):
     f = open('outputs/output_fracture_P{name0}_matching.txt'.format(name0=degV),'w')
