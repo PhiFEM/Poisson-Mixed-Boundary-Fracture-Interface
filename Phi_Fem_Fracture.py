@@ -2,6 +2,7 @@ import dolfin as df
 import matplotlib.pyplot as plt 
 from matplotlib import rc, rcParams
 import multiphenics as mph 
+import numpy as np
 
 # plot parameters
 plt.style.use('bmh') 
@@ -419,7 +420,7 @@ for i in range(start,end,step):
     print('erreur H1 = ',error_h1[-1])
     
 #  Write the output file for latex
-if np.mod(H,0):
+if np.mod(int(H),2):
     f = open('outputs/output_fracture_P{name0}_matching.txt'.format(name0=degV),'w')
 else:
     f = open('outputs/output_fracture_P{name0}_not_matching.txt'.format(name0=degV),'w')
