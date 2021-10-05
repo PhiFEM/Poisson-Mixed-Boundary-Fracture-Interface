@@ -266,9 +266,9 @@ print("conditioning number standard",cond_standard_vec)
 
 #  Write the output file for latex
 if ghost == False:
-	f = open('output_no_ghost_heat.txt','w')
+	f = open('outputs/output_heat_no_ghost.txt','w')
 if ghost == True:
-	f = open('output_ghost2_heat.txt','w')
+	f = open('outputs/output_heat_ghost.txt','w')
 f.write('relative L2 norm phi fem : \n')	
 output_latex(f,size_mesh_phi_fem_vec,error_L2_phi_fem_vec)
 f.write('relative H1 norm phi fem : \n')	
@@ -285,10 +285,3 @@ if conditioning == True:
 f.close()
 
 
-"""# Plot and save
-if Plot == True:
-	sol = project(u_h*phi,V)
-	plot_sol = plot(sol)
-	file = File('poisson.pvd')
-	file << sol
-	plt.savefig('myfig.png')"""
